@@ -7,15 +7,15 @@ import time
 def run_pulp():
     start_time = time.time()
     BIGM = 10**6  # bitti
-    CM = [1000, 1000, 10000, 1000, 1000, 1000]  # check
-    MA = [10, 10, 200, 10, 10, 20]  # check
-    K = np.arange(0, 6)  # bitti
-    T = np.arange(0, 48)  # bitti
-    TI = np.arange(-1, 48)  # bitti
-    KS = np.arange(0, 3)  # bitti
-    KN = np.arange(3, 6)  # bitti
+    CM = [1000, 1000, 10000, 1000, 1000, 1000]  
+    MA = [10, 10, 200, 10, 10, 20]  
+    K = np.arange(0, 6) 
+    T = np.arange(0, 48)  
+    TI = np.arange(-1, 48)  
+    KS = np.arange(0, 3)  
+    KN = np.arange(3, 6)  
 
-    db = Database("makineler.db")
+    db = Database("sales.db")
     names, D = db.get_forecast_by_cluster()
     D = np.round(D).astype(int)
 
@@ -24,12 +24,10 @@ def run_pulp():
     MS = np.arange(0, n_sb)
     MN = np.arange(n_sb, len(names))
 
-    Tj = [[5, 6, 7, 8, 9, 10, 11, 12, 13, 29, 30, 31, 32, 33, 34, 35, 36, 37]]  # bitti
+    Tj = [[5, 6, 7, 8, 9, 10, 11, 12, 13, 29, 30, 31, 32, 33, 34, 35, 36, 37]] 
 
-    TWj = [
-        [5, 6, 7, 8, 9, 10, 11, 12, 13],
-        [29, 30, 31, 32, 33, 34, 35, 36, 37],
-    ]  # bitti
+    TWj = [ [5, 6, 7, 8, 9, 10, 11, 12, 13],
+        [29, 30, 31, 32, 33, 34, 35, 36, 37],]  
 
     W = np.arange(0, 2)
     CR = [7, 7]
@@ -39,10 +37,10 @@ def run_pulp():
         new_list = [1 if i in sublist else 0 for i in T]
         Wt = new_list
 
-    # Create the LP problem
+    # Creating the LP problem
     model = LpProblem("Coffee", LpMinimize)
 
-    # Add variables
+    # Adding variables
     Y = LpVariable.dicts("Y", (M, K, T), cat=LpBinary)
     I = LpVariable.dicts("I", (M, K, TI), lowBound=-BIGM)
     F = LpVariable.dicts("F", (M, K, T), cat=LpInteger)
@@ -67,14 +65,14 @@ def run_pulp():
     model.setObjective(starobj + nesobj - 0.0001 * lpSum(X[m, t] for m in M for t in T))
 
     for m in MS:
-        model += I[m][0][-1] == 1000, f"Bok2_{m}_{0}"
-        model += I[m][1][-1] == 1000, f"Bok2_{m}_{1}"
-        model += I[m][2][-1] == 10000, f"Bok2_{m}_{2}"
+        model += I[m][0][-1] == 1000, f"{m}_{0}"
+        model += I[m][1][-1] == 1000, f"{m}_{1}"
+        model += I[m][2][-1] == 10000, f"{m}_{2}"
 
     for m in MN:
-        model += I[m][3][-1] == 1000, f"Bok1_{m}_{3}"
-        model += I[m][4][-1] == 1000, f"Bok1_{m}_{4}"
-        model += I[m][5][-1] == 1000, f"Bok1_{m}_{5}"
+        model += I[m][3][-1] == 1000, f"{m}_{3}"
+        model += I[m][4][-1] == 1000, f"{m}_{4}"
+        model += I[m][5][-1] == 1000, f"{m}_{5}"
 
     # constraint 2
     for m in MN:
@@ -141,7 +139,7 @@ def run_pulp():
     for t in T:
         model += lpSum(X[m, t] for m in M) <= 1
 
-    # Solve the problem with the callback function
+    # Solving the problem with the callback function
     model.solve(PULP_CBC_CMD(msg=True, timeLimit=60))
 
     end_time = time.time()
