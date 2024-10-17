@@ -5,8 +5,7 @@ import pandas as pd
 
 def run_cluster(df: pd.DataFrame, k: int):
     """
-    Perform k-means clustering on the given DataFrame.
-
+    Performing k-means clustering on the given DataFrame.
     Parameters:
     df (pd.DataFrame): The input DataFrame.
     k (int): The number of clusters to create.
